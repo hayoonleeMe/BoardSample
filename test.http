@@ -1,3 +1,4 @@
+### 게시글 생성
 POST http://localhost:8080/posts
 Content-Type: application/json
 
@@ -7,6 +8,20 @@ Content-Type: application/json
   "author": "초보개발자"
 }
 
-###
-
+### 게시글 전체 조회
 GET http://localhost:8080/posts
+
+### 게시글 단건 상세 조회
+GET http://localhost:8080/posts/1
+
+### 게시글 수정
+PUT http://localhost:8080/posts/1
+Content-Type: application/json
+
+{
+  "title": "수정된 게시글 제목",
+  "content": "JPA의 변경 감지를 이용한 수정입니다."
+}
+
+### 게시글 삭제
+DELETE http://localhost:8080/posts/1

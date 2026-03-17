@@ -2,6 +2,7 @@ package com.example.board.service;
 
 import com.example.board.entity.Post;
 import com.example.board.repository.PostRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,5 +26,33 @@ public class PostService {
 
     public List<Post> getAllPosts() {
         return postRepository.findAll();
+    }
+
+    /*
+     * findById와 orElseThrow: 데이터베이스에서 id(글 번호)를 기준으로 데이터를 찾는다.
+     * 만약 누군가 이미 삭제했거나 없는 번호를 요청했을 경우, 프로그램이 멈추지 않도록 예외(에러 메시지)를 발생시키는 안전장치다.
+     */
+    public Post getPost(Long id) {
+        return postRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다. id=" + id));
+    }
+
+    /*
+     * @Transactional: 수정과 삭제 로직에 붙은 이 어노테이션은 해당 메서드가 실행되는 전체 과정을 하나의 작업 단위(트랜잭션)로 묶어준다.
+     * 특히 수정을 할 때 이 어노테이션이 있어야만 앞서 설명한 변경 감지(Dirty Checking) 마법이 발동하여 데이터베이스에 값이 정상적으로 반영된다.
+     */
+    @Transactional
+    public Post updatePost(Long id, Post requestPost) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다. id=" + id));
+        post.update(requestPost.getTitle(), requestPost.getContent());
+        return post;
+    }
+
+    @Transactional
+    public void deletePost(Long id) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다. id=" + id));
+        postRepository.delete(post);
     }
 }

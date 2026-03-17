@@ -42,4 +42,26 @@ public class PostController {
     public List<Post> getAllPosts() {
         return postService.getAllPosts();
     }
+
+    /*
+     * @PathVariable: 앞서 RESTful API에서는 자원을 명시할 때 /posts/1 처럼 주소 뒤에 식별자를 붙인다고 설명했다.
+     * 주소창에 들어온 이 1이라는 숫자를 자바 코드의 id 변수로 쏙 뽑아내어 연결해 주는 어노테이션이다.
+     */
+    @GetMapping("/{id}")
+    public Post getPost(@PathVariable Long id) {
+        return postService.getPost(id);
+    }
+
+    /*
+     * @PutMapping / @DeleteMapping: 자원의 수정과 삭제를 의미하는 HTTP 메서드 규칙에 맞춰 컨트롤러의 동작을 분리했다.
+     */
+    @PutMapping("/{id}")
+    public Post updatePost(@PathVariable Long id, @RequestBody Post post) {
+        return postService.updatePost(id, post);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deletePost(@PathVariable Long id) {
+        postService.deletePost(id);
+    }
 }
