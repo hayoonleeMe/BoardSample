@@ -1,0 +1,12 @@
+POST http://localhost:8080/posts
+Content-Type: application/json
+
+{
+  "title": "첫 번째 게시글",
+  "content": "스프링 부트로 만든 API 테스트입니다.",
+  "author": "초보개발자"
+}
+
+###
+
+GET http://localhost:8080/posts
