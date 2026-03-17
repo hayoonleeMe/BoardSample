@@ -1,7 +1,7 @@
 package com.example.board.controller;
 
 import com.example.board.entity.Post;
-import com.example.board.repository.PostRepository;
+import com.example.board.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,7 +15,7 @@ import java.util.List;
  * 사용자가 인터넷 창에 웹서버주소/posts 라고 입력하거나 요청을 보내면 이 클래스가 작동하기 시작한다.
  *
  * @RequiredArgsConstructor: 롬복이 제공하는 기능이다.
- * 클래스 내부에 선언된 final 변수(여기서는 postRepository)를 스프링이 알아서 조립해 주는 의존성 주입(Dependency Injection)을 매우 간편하게 만들어 준다.
+ * 클래스 내부에 선언된 final 변수(여기서는 postService)를 스프링이 알아서 조립해 주는 의존성 주입(Dependency Injection)을 매우 간편하게 만들어 준다.
  * 이 덕분에 우리는 직접 레포지토리 객체를 생성하는 코드를 짜지 않아도 된다.
  */
 @RestController
@@ -23,7 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PostController {
 
-    private final PostRepository postRepository;
+    private final PostService postService;
 
     /*
      * @PostMapping 과 @GetMapping: HTTP 통신 방식을 구분한다.
@@ -35,11 +35,11 @@ public class PostController {
      */
     @PostMapping
     public Post createPost(@RequestBody Post post) {
-        return postRepository.save(post);
+        return postService.createPost(post);
     }
 
     @GetMapping
     public List<Post> getAllPosts() {
-        return postRepository.findAll();
+        return postService.getAllPosts();
     }
 }
