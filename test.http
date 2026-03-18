@@ -44,3 +44,13 @@ GET http://localhost:8080/posts?page=0&size=5
 
 ### 특정 단어로 검색하는 경우 (예: '게시글'이 포함된 글 검색)
 GET http://localhost:8080/posts?keyword=게시글&page=0&size=5
+
+### 유효성 검증 실패 테스트 (제목 누락)
+POST http://localhost:8080/posts
+Content-Type: application/json
+
+{
+  "title": "   ",
+  "content": "내용은 정상적으로 입력했습니다.",
+  "author": "초보개발자"
+}

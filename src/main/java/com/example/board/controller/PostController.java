@@ -3,6 +3,7 @@ package com.example.board.controller;
 import com.example.board.dto.PostRequestDto;
 import com.example.board.dto.PostResponseDto;
 import com.example.board.service.PostService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,9 +36,13 @@ public class PostController {
      * @RequestBody: 사용자가 웹 브라우저에서 입력한 데이터를 서버로 보낼 때, 그 데이터가 담긴 HTTP 요청의 본문(Body)을 자바 객체로 변환해 주는 역할을 한다.
      * 프론트엔드에서 주로 JSON 형태의 텍스트로 데이터를 묶어서 보내면, 스프링이 이를 분석하여 우리가 앞서 만든 Post 클래스의 각 필드(title, content 등)에 알맞게 값을 짝지어 채워 넣어 준다.
      * 이 어노테이션을 명시하지 않으면 클라이언트가 보낸 데이터를 컨트롤러가 정상적으로 수신할 수 없다.
+     *
+     * @Valid: DTO 클래스 내부에 설정해둔 검증 규칙(@NotBlank, @Size 등)을 실제로 작동시키라고 스프링에게 내리는 실행 스위치다.
+     * 클라이언트의 요청 데이터가 컨트롤러의 메서드 안으로 본격적으로 진입하기 직전에 문지기처럼 데이터를 먼저 검사한다.
+     * 만약 규칙을 하나라도 통과하지 못하면 메서드 내부의 로직을 아예 실행하지 않고 즉시 예외(MethodArgumentNotValidException)를 발생시켜 불량 데이터의 침입을 원천 차단한다.
      */
     @PostMapping
-    public PostResponseDto createPost(@RequestBody PostRequestDto requestDto) {
+    public PostResponseDto createPost(@Valid @RequestBody PostRequestDto requestDto) {
         return postService.createPost(requestDto);
     }
 
@@ -76,7 +81,7 @@ public class PostController {
      * @PutMapping / @DeleteMapping: 자원의 수정과 삭제를 의미하는 HTTP 메서드 규칙에 맞춰 컨트롤러의 동작을 분리했다.
      */
     @PutMapping("/{id}")
-    public PostResponseDto updatePost(@PathVariable Long id, @RequestBody PostRequestDto requestDto) {
+    public PostResponseDto updatePost(@PathVariable Long id, @Valid @RequestBody PostRequestDto requestDto) {
         return postService.updatePost(id, requestDto);
     }
 

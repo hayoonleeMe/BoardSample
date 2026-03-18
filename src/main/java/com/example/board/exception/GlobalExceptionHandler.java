@@ -3,6 +3,7 @@ package com.example.board.exception;
 import com.example.board.dto.ErrorResponseDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -25,6 +26,13 @@ public class GlobalExceptionHandler {
         ErrorResponseDto responseDto = new ErrorResponseDto(e.getMessage(), HttpStatus.BAD_REQUEST.value());
 
         // ResponseEntity라는 스프링의 웹 응답용 포장지에 한 번 더 감싸서 반환한다.
+        return new ResponseEntity<>(responseDto, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponseDto> handleValidationExceptions(MethodArgumentNotValidException e) {
+        String errorMessage = e.getBindingResult().getAllErrors().getFirst().getDefaultMessage();
+        ErrorResponseDto responseDto = new ErrorResponseDto(errorMessage, HttpStatus.BAD_REQUEST.value());
         return new ResponseEntity<>(responseDto, HttpStatus.BAD_REQUEST);
     }
 }
