@@ -25,3 +25,6 @@ Content-Type: application/json
 
 ### 게시글 삭제
 DELETE http://localhost:8080/posts/1
+
+### 없는 게시글 조회 테스트
+GET http://localhost:8080/posts/999
