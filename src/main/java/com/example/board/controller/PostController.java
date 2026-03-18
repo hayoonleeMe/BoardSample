@@ -1,6 +1,7 @@
 package com.example.board.controller;
 
-import com.example.board.entity.Post;
+import com.example.board.dto.PostRequestDto;
+import com.example.board.dto.PostResponseDto;
 import com.example.board.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -34,12 +35,12 @@ public class PostController {
      * 이 어노테이션을 명시하지 않으면 클라이언트가 보낸 데이터를 컨트롤러가 정상적으로 수신할 수 없다.
      */
     @PostMapping
-    public Post createPost(@RequestBody Post post) {
-        return postService.createPost(post);
+    public PostResponseDto createPost(@RequestBody PostRequestDto requestDto) {
+        return postService.createPost(requestDto);
     }
 
     @GetMapping
-    public List<Post> getAllPosts() {
+    public List<PostResponseDto> getAllPosts() {
         return postService.getAllPosts();
     }
 
@@ -48,7 +49,7 @@ public class PostController {
      * 주소창에 들어온 이 1이라는 숫자를 자바 코드의 id 변수로 쏙 뽑아내어 연결해 주는 어노테이션이다.
      */
     @GetMapping("/{id}")
-    public Post getPost(@PathVariable Long id) {
+    public PostResponseDto getPost(@PathVariable Long id) {
         return postService.getPost(id);
     }
 
@@ -56,8 +57,8 @@ public class PostController {
      * @PutMapping / @DeleteMapping: 자원의 수정과 삭제를 의미하는 HTTP 메서드 규칙에 맞춰 컨트롤러의 동작을 분리했다.
      */
     @PutMapping("/{id}")
-    public Post updatePost(@PathVariable Long id, @RequestBody Post post) {
-        return postService.updatePost(id, post);
+    public PostResponseDto updatePost(@PathVariable Long id, @RequestBody PostRequestDto requestDto) {
+        return postService.updatePost(id, requestDto);
     }
 
     @DeleteMapping("/{id}")

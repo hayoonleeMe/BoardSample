@@ -1,5 +1,7 @@
 package com.example.board.service;
 
+import com.example.board.dto.PostRequestDto;
+import com.example.board.dto.PostResponseDto;
 import com.example.board.entity.Post;
 import com.example.board.repository.PostRepository;
 import jakarta.transaction.Transactional;
@@ -7,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /*
  * @Service: 스프링에게 이 클래스가 비즈니스 로직을 담당하는 서비스 계층임을 알리고, 스프링이 객체를 관리하도록 만든다.
@@ -19,22 +22,27 @@ public class PostService {
 
     private final PostRepository postRepository;
 
-    public Post createPost(Post post) {
-        // 나중에 여기에 데이터를 검증하거나 가공하는 비즈니스 로직을 추가할 수 있다.
-        return postRepository.save(post);
+    public PostResponseDto createPost(PostRequestDto requestDto) {
+        Post post = new Post(requestDto.getTitle(), requestDto.getContent(), requestDto.getAuthor());
+        Post savedPost = postRepository.save(post);
+        return new PostResponseDto(savedPost);
     }
 
-    public List<Post> getAllPosts() {
-        return postRepository.findAll();
+    public List<PostResponseDto> getAllPosts() {
+        // List<Post>의 각 요소를 PostResponseDto로 만들고 다시 List로 반환한다.
+        return postRepository.findAll().stream()
+                .map(PostResponseDto::new)
+                .collect(Collectors.toList());
     }
 
     /*
      * findById와 orElseThrow: 데이터베이스에서 id(글 번호)를 기준으로 데이터를 찾는다.
      * 만약 누군가 이미 삭제했거나 없는 번호를 요청했을 경우, 프로그램이 멈추지 않도록 예외(에러 메시지)를 발생시키는 안전장치다.
      */
-    public Post getPost(Long id) {
-        return postRepository.findById(id)
+    public PostResponseDto getPost(Long id) {
+        Post post = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다. id=" + id));
+        return new PostResponseDto(post);
     }
 
     /*
@@ -42,11 +50,11 @@ public class PostService {
      * 특히 수정을 할 때 이 어노테이션이 있어야만 앞서 설명한 변경 감지(Dirty Checking) 마법이 발동하여 데이터베이스에 값이 정상적으로 반영된다.
      */
     @Transactional
-    public Post updatePost(Long id, Post requestPost) {
+    public PostResponseDto updatePost(Long id, PostRequestDto requestDto) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다. id=" + id));
-        post.update(requestPost.getTitle(), requestPost.getContent());
-        return post;
+        post.update(requestDto.getTitle(), requestDto.getContent());
+        return new PostResponseDto(post);
     }
 
     @Transactional
