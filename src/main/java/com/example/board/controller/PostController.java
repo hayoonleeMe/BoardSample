@@ -4,9 +4,11 @@ import com.example.board.dto.PostRequestDto;
 import com.example.board.dto.PostResponseDto;
 import com.example.board.service.PostService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /*
  * @RestController: 이 클래스가 웹 요청을 처리하는 컨트롤러임을 스프링에 알린다.
@@ -39,9 +41,15 @@ public class PostController {
         return postService.createPost(requestDto);
     }
 
+    /*
+     * Pageable pageable: 클라이언트가 URL 뒤에 ?page=0&size=10 처럼 조건을 달아서 보내면, 스프링이 이를 인식하여 Pageable 객체로 자동 변환해 준다. (주의: 스프링의 페이지 번호는 0부터 시작한다.)
+     *
+     * @PageableDefault: 만약 클라이언트가 아무 조건 없이 /posts 라고만 요청했을 때 적용될 기본값을 설정하는 방어벽이다.
+     * 위 코드에서는 "기본적으로 한 페이지당 10개씩(size = 10), 글 번호(id)를 기준으로 최신 글이 위로 오도록 내림차순(DESC) 정렬해서 보여줘"라는 의미를 담고 있다.
+     */
     @GetMapping
-    public List<PostResponseDto> getAllPosts() {
-        return postService.getAllPosts();
+    public Page<PostResponseDto> getAllPosts(@PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+        return postService.getAllPosts(pageable);
     }
 
     /*

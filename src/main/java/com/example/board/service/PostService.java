@@ -6,10 +6,9 @@ import com.example.board.entity.Post;
 import com.example.board.repository.PostRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 /*
  * @Service: 스프링에게 이 클래스가 비즈니스 로직을 담당하는 서비스 계층임을 알리고, 스프링이 객체를 관리하도록 만든다.
@@ -28,11 +27,12 @@ public class PostService {
         return new PostResponseDto(savedPost);
     }
 
-    public List<PostResponseDto> getAllPosts() {
-        // List<Post>의 각 요소를 PostResponseDto로 만들고 다시 List로 반환한다.
-        return postRepository.findAll().stream()
-                .map(PostResponseDto::new)
-                .collect(Collectors.toList());
+    public Page<PostResponseDto> getAllPosts(Pageable pageable) {
+        // Repository에 Pageable 객체를 넘기면 알아서 데이터베이스에서 해당 페이지 번호의 조각만 가져온다.
+        Page<Post> postPage = postRepository.findAll(pageable);
+
+        // 찾아온 Page<Post> 객체를 map 함수를 이용해 Page<PostResponseDto>로 변환하여 반환한다.
+        return postPage.map(PostResponseDto::new);
     }
 
     /*

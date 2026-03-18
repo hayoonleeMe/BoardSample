@@ -28,3 +28,13 @@ DELETE http://localhost:8080/posts/1
 
 ### 없는 게시글 조회 테스트
 GET http://localhost:8080/posts/999
+
+### 기본 조회 (1페이지, 10개씩, 최신순 정렬 적용됨)
+GET http://localhost:8080/posts
+
+### 조건 지정 조회 (1페이지, 2개씩 가져오기)
+### url 파라미터에서 page는 0이 1페이지를 의미한다.
+GET http://localhost:8080/posts?page=0&size=2
+
+### 다음 페이지 조회 (2페이지, 2개씩 가져오기)
+GET http://localhost:8080/posts?page=1&size=2
