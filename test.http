@@ -38,3 +38,9 @@ GET http://localhost:8080/posts?page=0&size=2
 
 ### 다음 페이지 조회 (2페이지, 2개씩 가져오기)
 GET http://localhost:8080/posts?page=1&size=2
+
+### 검색어가 없는 경우 (기존 전체 페이징 조회)
+GET http://localhost:8080/posts?page=0&size=5
+
+### 특정 단어로 검색하는 경우 (예: '게시글'이 포함된 글 검색)
+GET http://localhost:8080/posts?keyword=게시글&page=0&size=5

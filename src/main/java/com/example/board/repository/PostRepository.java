@@ -1,6 +1,8 @@
 package com.example.board.repository;
 
 import com.example.board.entity.Post;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /*
@@ -12,4 +14,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * 기본 기능 즉시 사용: 결과적으로 우리는 아무 코드도 짜지 않았지만, 이 레포지토리를 통해 데이터를 저장하는 save(), 모든 게시글을 가져오는 findAll(), 글 번호로 하나만 찾는 findById() 등의 기능을 즉시 호출해서 쓸 수 있게 된다.
  */
 public interface PostRepository extends JpaRepository<Post, Long> {
+
+    /*
+     * 스프링 데이터 JPA의 가장 강력한 특징은 자바 인터페이스에 규칙에 맞는 이름으로 추상 메서드만 선언해 두면, 구현체 클래스를 작성하지 않아도 스프링이 알아서 데이터베이스 조회 코드를 만들어준다는 것이다.
+     * 이를 쿼리 메서드(Query Method)라고 부른다.
+     *
+     * 함수 이름의 문법적 의미
+     * findBy: 데이터를 조회하겠다는 기본 명령어다.
+     * Title: 검색의 기준이 되는 자바 엔티티(Post)의 필드 이름이다.
+     * Containing: 전달받은 문자열(keyword)이 필드 값 앞, 뒤, 중간 어디든 포함되어 있으면 찾아오라는 의미다. (SQL의 LIKE %keyword% 와 동일하게 동작한다.)
+     */
+    Page<Post> findByTitleContaining(String keyword, Pageable pageable);
 }

@@ -63,4 +63,9 @@ public class PostService {
                 .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다. id=" + id));
         postRepository.delete(post);
     }
+
+    public Page<PostResponseDto> searchPosts(String keyword, Pageable pageable) {
+        Page<Post> postPage = postRepository.findByTitleContaining(keyword, pageable);
+        return postPage.map(PostResponseDto::new);
+    }
 }

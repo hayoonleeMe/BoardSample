@@ -42,13 +42,24 @@ public class PostController {
     }
 
     /*
+     * @RequestParam(required = false): 클라이언트가 URL 뒤에 ?keyword=단어 형태로 데이터를 보낼 때, 이를 자바의 keyword 변수로 매핑해 주는 어노테이션이다.
+     * required = false 속성을 주면 검색어를 보내지 않아도 에러가 발생하지 않고 자바 변수에 null이 들어온다.
+     *
      * Pageable pageable: 클라이언트가 URL 뒤에 ?page=0&size=10 처럼 조건을 달아서 보내면, 스프링이 이를 인식하여 Pageable 객체로 자동 변환해 준다. (주의: 스프링의 페이지 번호는 0부터 시작한다.)
      *
      * @PageableDefault: 만약 클라이언트가 아무 조건 없이 /posts 라고만 요청했을 때 적용될 기본값을 설정하는 방어벽이다.
      * 위 코드에서는 "기본적으로 한 페이지당 10개씩(size = 10), 글 번호(id)를 기준으로 최신 글이 위로 오도록 내림차순(DESC) 정렬해서 보여줘"라는 의미를 담고 있다.
      */
     @GetMapping
-    public Page<PostResponseDto> getAllPosts(@PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+    public Page<PostResponseDto> getAllPosts(
+            @RequestParam(required = false) String keyword,
+            @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+        // 문자열 검증
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            // 검색어가 존재하면 찾아서 조회
+            return postService.searchPosts(keyword, pageable);
+        }
+        // 검색어가 존재하지 않으면 전체 조회
         return postService.getAllPosts(pageable);
     }
 
