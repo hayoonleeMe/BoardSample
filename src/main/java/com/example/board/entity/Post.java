@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-public class Post {
+public class Post extends BaseTimeEntity {
 
     /*
      * @Id: 이 테이블의 각 데이터를 구분하는 고유 식별자(Primary Key) 역할을 하는 필드임을 지정한다.
