@@ -2,6 +2,7 @@ package com.example.board.service;
 
 import com.example.board.dto.PostRequestDto;
 import com.example.board.dto.PostResponseDto;
+import com.example.board.dto.PostUpdateRequestDto;
 import com.example.board.entity.Post;
 import com.example.board.repository.PostRepository;
 import jakarta.transaction.Transactional;
@@ -50,7 +51,7 @@ public class PostService {
      * 특히 수정을 할 때 이 어노테이션이 있어야만 앞서 설명한 변경 감지(Dirty Checking) 마법이 발동하여 데이터베이스에 값이 정상적으로 반영된다.
      */
     @Transactional
-    public PostResponseDto updatePost(Long id, PostRequestDto requestDto) {
+    public PostResponseDto updatePost(Long id, PostUpdateRequestDto requestDto) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다. id=" + id));
         post.update(requestDto.getTitle(), requestDto.getContent());

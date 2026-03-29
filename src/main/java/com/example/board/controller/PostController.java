@@ -2,6 +2,7 @@ package com.example.board.controller;
 
 import com.example.board.dto.PostRequestDto;
 import com.example.board.dto.PostResponseDto;
+import com.example.board.dto.PostUpdateRequestDto;
 import com.example.board.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -81,7 +82,7 @@ public class PostController {
      * @PutMapping / @DeleteMapping: 자원의 수정과 삭제를 의미하는 HTTP 메서드 규칙에 맞춰 컨트롤러의 동작을 분리했다.
      */
     @PutMapping("/{id}")
-    public PostResponseDto updatePost(@PathVariable Long id, @Valid @RequestBody PostRequestDto requestDto) {
+    public PostResponseDto updatePost(@PathVariable Long id, @Valid @RequestBody PostUpdateRequestDto requestDto) {
         return postService.updatePost(id, requestDto);
     }
 
