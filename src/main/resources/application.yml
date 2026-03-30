@@ -21,3 +21,6 @@ springdoc:
     display-request-duration: true
   api-docs:
     path: /api-docs
+
+admin:
+  token: ${ADMIN_TOKEN}

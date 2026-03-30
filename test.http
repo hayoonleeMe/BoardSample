@@ -74,3 +74,14 @@ Content-Type: application/json
 
 ### 1번 게시글의 1번 댓글 삭제
 DELETE http://localhost:8080/posts/1/comments/1
+
+### 회원가입
+POST http://localhost:8080/users/signup
+Content-Type: application/json
+
+{
+  "username": "testuser1",
+  "password": "Password123",
+  "admin": false,
+  "adminToken": ""
+}
