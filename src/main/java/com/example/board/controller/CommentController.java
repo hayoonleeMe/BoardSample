@@ -2,6 +2,7 @@ package com.example.board.controller;
 
 import com.example.board.dto.CommentRequestDto;
 import com.example.board.dto.CommentResponseDto;
+import com.example.board.dto.CommentUpdateRequestDto;
 import com.example.board.service.CommentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,4 +26,15 @@ public class CommentController {
     public CommentResponseDto createComment(@PathVariable Long postId, @Valid @RequestBody CommentRequestDto requestDto) {
         return commentService.createComment(postId, requestDto);
     }
+
+    @PutMapping("/{commentId}")
+    public CommentResponseDto updateComment(@PathVariable Long postId, @PathVariable Long commentId, @Valid @RequestBody CommentUpdateRequestDto requestDto) {
+        return commentService.updateComment(commentId, requestDto);
+    }
+
+    @DeleteMapping("/{commentId}")
+    public void deleteComment(@PathVariable Long postId, @PathVariable Long commentId) {
+        commentService.deleteComment(commentId);
+    }
+
 }

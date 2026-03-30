@@ -63,3 +63,14 @@ Content-Type: application/json
   "content": "JPA 연관관계 매핑 테스트 댓글입니다.",
   "author": "테스터"
 }
+
+### 1번 게시글의 1번 댓글 수정
+PUT http://localhost:8080/posts/1/comments/1
+Content-Type: application/json
+
+{
+  "content": "수정된 댓글 내용입니다."
+}
+
+### 1번 게시글의 1번 댓글 삭제
+DELETE http://localhost:8080/posts/1/comments/1
