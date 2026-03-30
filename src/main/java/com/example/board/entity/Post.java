@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /*
  * @Entity: 스프링(JPA)에게 이 클래스는 데이터베이스의 테이블과 매핑될 엔티티다라고 알려주는 표시다.
  * 이 클래스 이름대로 DB에 'post'라는 테이블이 생성된다.
@@ -38,6 +41,20 @@ public class Post extends BaseTimeEntity {
     private String content;
 
     private String author;
+
+    /*
+     * @OneToMany: 게시글(One) 입장에서 댓글(Many)과의 관계를 명시한다.
+     *
+     * mappedBy: 연관관계의 주인이 자신이 아니라 Comment 엔티티에 있는 post 필드임을 선언한다.
+     * 이 속성을 적어주어야 현재 필드가 읽기 전용으로 동작하며, 불필요한 외래 키 업데이트 쿼리가 발생하는 것을 방지한다.
+     *
+     * cascade = CascadeType.ALL: 부모 엔티티(게시글)의 상태 변화를 자식 엔티티(댓글)에도 전파한다.
+     * 즉, 게시글을 삭제하면 데이터베이스에 남은 연관 댓글들도 자동으로 함께 삭제된다.
+     *
+     * orphanRemoval = true: 부모와의 연관관계가 끊어진 자식 엔티티(고아 객체)를 데이터베이스에서 자동으로 삭제해 주는 옵션이다.
+     */
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
 
     public void update(String title, String content) {
         this.title = title;
