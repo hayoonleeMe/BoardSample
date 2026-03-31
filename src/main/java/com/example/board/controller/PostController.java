@@ -5,6 +5,8 @@ import com.example.board.dto.PostResponseDto;
 import com.example.board.dto.PostUpdateRequestDto;
 import com.example.board.security.UserDetailsImpl;
 import com.example.board.service.PostService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -81,8 +83,11 @@ public class PostController {
      * 주소창에 들어온 이 1이라는 숫자를 자바 코드의 id 변수로 쏙 뽑아내어 연결해 주는 어노테이션이다.
      */
     @GetMapping("/{id}")
-    public PostResponseDto getPost(@PathVariable Long id) {
-        return postService.getPost(id);
+    public PostResponseDto getPost(
+            @PathVariable Long id,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+        return postService.getPost(id, request, response);
     }
 
     /*

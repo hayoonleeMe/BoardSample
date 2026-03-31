@@ -9,6 +9,9 @@ import com.example.board.entity.User;
 import com.example.board.entity.UserRoleEnum;
 import com.example.board.repository.PostLikeRepository;
 import com.example.board.repository.PostRepository;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +32,9 @@ public class PostService {
     private final PostRepository postRepository;
     private final PostLikeRepository postLikeRepository;
 
+    private static final String VIEW_COOKIE_PREFIX = "postView_";
+    private static final int VIEW_COOKIE_MAX_AGE = 60 * 60 * 24; // 24시간
+
     public PostResponseDto createPost(PostRequestDto requestDto, User user) {
         Post post = new Post(requestDto.getTitle(), requestDto.getContent(), user);
         Post savedPost = postRepository.save(post);
@@ -47,10 +53,37 @@ public class PostService {
      * findById와 orElseThrow: 데이터베이스에서 id(글 번호)를 기준으로 데이터를 찾는다.
      * 만약 누군가 이미 삭제했거나 없는 번호를 요청했을 경우, 프로그램이 멈추지 않도록 예외(에러 메시지)를 발생시키는 안전장치다.
      */
-    @Transactional(readOnly = true)
-    public PostResponseDto getPost(Long id) {
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다. id=" + id));
+    @Transactional()
+    public PostResponseDto getPost(Long id, HttpServletRequest request, HttpServletResponse response) {
+        Post post = findPost(id);
+
+        // 조회수 중복 방지 로직 (Cookie 활용)
+        Cookie[] cookies = request.getCookies();
+        boolean isVisited = false;
+
+        String targetCookieName = VIEW_COOKIE_PREFIX + id;
+
+        // 클라이언트가 보낸 쿠키들을 순회하며 해당 게시글 번호가 적힌 쿠키가 있는지 확인한다.
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals(targetCookieName)) {
+                    isVisited = true;
+                    break;
+                }
+            }
+        }
+
+        if (!isVisited) {
+            post.incrementViewCount();
+
+            // 조합된 쿠키 이름과 상수로 정의된 만료 시간을 적용한다.
+            Cookie newCookie = new Cookie(targetCookieName, "true");
+            newCookie.setMaxAge(VIEW_COOKIE_MAX_AGE);
+            newCookie.setPath("/");
+
+            response.addCookie(newCookie);
+        }
+
         return new PostResponseDto(post);
     }
 

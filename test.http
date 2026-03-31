@@ -230,3 +230,12 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjEiLCJhdXRoIjoiU
 ### 댓글 좋아요 토글
 POST http://localhost:8080/posts/1/comments/1/like
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjEiLCJhdXRoIjoiUk9MRV9VU0VSIiwiZXhwIjoxNzc0OTY0MzMxLCJpYXQiOjE3NzQ5NjA3MzF9.35rEG0QEueZIEDS5h87VJpRAULKJXz-M5_G8GMzd9js
+
+### 단건 게시글 조회
+GET http://localhost:8080/posts/1
+Accept: application/json
+
+### 단건 게시글 조회 (쿠키 포함)
+GET http://localhost:8080/posts/1
+Accept: application/json
+Cookie: postView_1=true

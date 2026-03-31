@@ -48,6 +48,10 @@ public class Post extends BaseTimeEntity {
     @Column(nullable = false)
     private int likeCount = 0;
 
+    // 조회수를 기록하는 필드 추가 (기본값 0)
+    @Column(nullable = false)
+    private int viewCount = 0;
+
     /*
      * @OneToMany: 게시글(One) 입장에서 댓글(Many)과의 관계를 명시한다.
      *
@@ -83,5 +87,10 @@ public class Post extends BaseTimeEntity {
         if (this.likeCount > 0) {
             this.likeCount--;
         }
+    }
+
+    // 조회쉬 증가 메서드
+    public void incrementViewCount() {
+        this.viewCount++;
     }
 }

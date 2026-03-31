@@ -18,6 +18,7 @@ public class PostResponseDto {
     private LocalDateTime updatedAt;
     private List<CommentResponseDto> comments;
     private int likeCount;
+    private int viewCount;
 
     public PostResponseDto(Post post) {
         this.id = post.getId();
@@ -33,5 +34,6 @@ public class PostResponseDto {
                 .collect(Collectors.toList());
 
         this.likeCount = post.getLikeCount();
+        this.viewCount = post.getViewCount();
     }
 }
