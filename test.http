@@ -222,3 +222,7 @@ Authorization: Bearer (손상된 토큰 값)
   "title": "예외 처리 테스트",
   "content": "이 요청은 실패하고 통일된 에러 응답이 와야 한다."
 }
+
+### 게시글 좋아요 추가
+POST http://localhost:8080/posts/1/like
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjEiLCJhdXRoIjoiUk9MRV9VU0VSIiwiZXhwIjoxNzc0OTU1Njg5LCJpYXQiOjE3NzQ5NTIwODl9.t9mfAxi-qcc1aPWopwSC42aATcNGbGzwHFNzajiI8uY

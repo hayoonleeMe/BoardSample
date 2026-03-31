@@ -4,14 +4,18 @@ import com.example.board.dto.PostRequestDto;
 import com.example.board.dto.PostResponseDto;
 import com.example.board.dto.PostUpdateRequestDto;
 import com.example.board.entity.Post;
+import com.example.board.entity.PostLike;
 import com.example.board.entity.User;
 import com.example.board.entity.UserRoleEnum;
+import com.example.board.repository.PostLikeRepository;
 import com.example.board.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 /*
  * @Service: 스프링에게 이 클래스가 비즈니스 로직을 담당하는 서비스 계층임을 알리고, 스프링이 객체를 관리하도록 만든다.
@@ -23,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final PostLikeRepository postLikeRepository;
 
     public PostResponseDto createPost(PostRequestDto requestDto, User user) {
         Post post = new Post(requestDto.getTitle(), requestDto.getContent(), user);
@@ -73,6 +78,26 @@ public class PostService {
     public Page<PostResponseDto> searchPosts(String keyword, Pageable pageable) {
         Page<Post> postPage = postRepository.findByTitleContaining(keyword, pageable);
         return postPage.map(PostResponseDto::new);
+    }
+
+    @Transactional
+    public String toggleLike(Long postId, User user) {
+        Post post = findPost(postId);
+
+        // 사용자가 해당 게시글에 이미 좋아요를 눌렀는지 확인한다.
+        Optional<PostLike> postLike = postLikeRepository.findByUserAndPost(user, post);
+
+        if (postLike.isPresent()) {
+            // 이미 존재한다면 좋아요 취소로 간주하고 삭제한다.
+            postLikeRepository.delete(postLike.get());
+            post.decrementLikeCount();
+            return "좋아요 취소 완료";
+        } else {
+            // 존재하지 않는다면 좋아요 추가로 간주하고 저장한다.
+            postLikeRepository.save(new PostLike(user, post));
+            post.incrementLikeCount();
+            return "좋아요 완료";
+        }
     }
 
     private Post findPost(Long id) {

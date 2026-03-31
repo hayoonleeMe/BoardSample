@@ -17,6 +17,7 @@ public class PostResponseDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private List<CommentResponseDto> comments;
+    private int likeCount;
 
     public PostResponseDto(Post post) {
         this.id = post.getId();
@@ -30,5 +31,7 @@ public class PostResponseDto {
         this.comments = post.getComments().stream()
                 .map(CommentResponseDto::new)
                 .collect(Collectors.toList());
+
+        this.likeCount = post.getLikeCount();
     }
 }

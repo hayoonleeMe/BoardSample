@@ -44,6 +44,10 @@ public class Post extends BaseTimeEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    // 좋아요 개수를 캐싱하는 필드 추가 (기본값 0)
+    @Column(nullable = false)
+    private int likeCount = 0;
+
     /*
      * @OneToMany: 게시글(One) 입장에서 댓글(Many)과의 관계를 명시한다.
      *
@@ -67,5 +71,17 @@ public class Post extends BaseTimeEntity {
         this.title = title;
         this.content = content;
         this.user = user;
+    }
+
+    // 좋아요 증가 메서드
+    public void incrementLikeCount() {
+        this.likeCount++;
+    }
+
+    // 좋아요 감소 메서드
+    public void decrementLikeCount() {
+        if (this.likeCount > 0) {
+            this.likeCount--;
+        }
     }
 }
