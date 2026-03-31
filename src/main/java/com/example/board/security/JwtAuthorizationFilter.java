@@ -1,5 +1,6 @@
 package com.example.board.security;
 
+import com.example.board.dto.ErrorResponseDto;
 import com.example.board.util.JwtUtil;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -15,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
+import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 
@@ -43,7 +45,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             // 토큰 유효성 검사
             if (!jwtUtil.validateToken(tokenValue)) {
                 log.error("Token Error, 유효하지 않은 토큰입니다.");
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                jwtExceptionHandler(response, "토큰이 유효하지 않습니다.", HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
 
@@ -55,7 +57,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 setAuthentication(info.getSubject());
             } catch (Exception e) {
                 log.error("인증 처리 중 예외 발생: {}", e.getMessage());
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                jwtExceptionHandler(response, "인증 처리에 실패했습니다.", HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
         }
@@ -81,5 +83,18 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private Authentication createAuthentication(String username) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+    }
+
+    // 필터 전용 예외 처리 메서드
+    public void jwtExceptionHandler(HttpServletResponse response, String msg, int statusCode) {
+        response.setStatus(statusCode);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        try {
+            String json = new ObjectMapper().writeValueAsString(new ErrorResponseDto(msg, statusCode));
+            response.getWriter().write(json);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
     }
 }
