@@ -16,8 +16,9 @@ public class Comment extends BaseTimeEntity {
     @Column(nullable = false, length = 500)
     private String content;
 
-    @Column(nullable = false)
-    private String author;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     /*
      * @ManyToOne: 댓글(Many) 입장에서 게시글(One)과의 관계를 명시하는 어노테이션이다.
@@ -30,10 +31,10 @@ public class Comment extends BaseTimeEntity {
     @JoinColumn(name = "post_id")
     private Post post;
 
-    public Comment(String content, String author, Post post) {
+    public Comment(String content, Post post, User user) {
         this.content = content;
-        this.author = author;
         this.post = post;
+        this.user = user;
     }
 
     public void update(String content) {

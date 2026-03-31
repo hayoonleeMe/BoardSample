@@ -3,9 +3,11 @@ package com.example.board.controller;
 import com.example.board.dto.CommentRequestDto;
 import com.example.board.dto.CommentResponseDto;
 import com.example.board.dto.CommentUpdateRequestDto;
+import com.example.board.security.UserDetailsImpl;
 import com.example.board.service.CommentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 /*
@@ -23,18 +25,25 @@ public class CommentController {
      * @PathVariable: URL 경로에 포함된 동적인 변수({postId})의 값을 추출하여 자바 메서드의 매개변수인 Long postId 에 매핑해 주는 역할을 한다.
      */
     @PostMapping
-    public CommentResponseDto createComment(@PathVariable Long postId, @Valid @RequestBody CommentRequestDto requestDto) {
-        return commentService.createComment(postId, requestDto);
+    public CommentResponseDto createComment(@PathVariable Long postId,
+                                            @Valid @RequestBody CommentRequestDto requestDto,
+                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return commentService.createComment(postId, requestDto, userDetails.getUser());
     }
 
     @PutMapping("/{commentId}")
-    public CommentResponseDto updateComment(@PathVariable Long postId, @PathVariable Long commentId, @Valid @RequestBody CommentUpdateRequestDto requestDto) {
-        return commentService.updateComment(commentId, requestDto);
+    public CommentResponseDto updateComment(@PathVariable Long postId,
+                                            @PathVariable Long commentId,
+                                            @Valid @RequestBody CommentUpdateRequestDto requestDto,
+                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return commentService.updateComment(commentId, requestDto, userDetails.getUser());
     }
 
     @DeleteMapping("/{commentId}")
-    public void deleteComment(@PathVariable Long postId, @PathVariable Long commentId) {
-        commentService.deleteComment(commentId);
+    public void deleteComment(@PathVariable Long postId,
+                              @PathVariable Long commentId,
+                              @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        commentService.deleteComment(commentId, userDetails.getUser());
     }
 
 }

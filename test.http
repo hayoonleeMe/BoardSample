@@ -119,7 +119,7 @@ Authorization: Bearer ()
 ### 게시글 작성
 POST http://localhost:8080/posts
 Content-Type: application/json
-Authorization: Bearer ()
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjEiLCJhdXRoIjoiUk9MRV9VU0VSIiwiZXhwIjoxNzc0OTQ2NTg5LCJpYXQiOjE3NzQ5NDI5ODl9.XfImbz3_5XK_O0cRuHmIXFciLMsagIbo0Q7DJFza3iQ
 
 {
   "title": "작성자 연동 테스트",
@@ -144,4 +144,31 @@ Authorization: Bearer ()
 {
   "title": "남의 글 몰래 수정하기",
   "content": "이 요청은 실패해야 한다."
+}
+
+### 댓글 작성
+POST http://localhost:8080/posts/1/comments
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjEiLCJhdXRoIjoiUk9MRV9VU0VSIiwiZXhwIjoxNzc0OTQ2NTg5LCJpYXQiOjE3NzQ5NDI5ODl9.XfImbz3_5XK_O0cRuHmIXFciLMsagIbo0Q7DJFza3iQ
+
+{
+  "content": "인증 토큰을 통해 작성자 이름이 자동으로 연결된다."
+}
+
+### 본인 댓글 수정
+PUT http://localhost:8080/posts/1/comments/1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjEiLCJhdXRoIjoiUk9MRV9VU0VSIiwiZXhwIjoxNzc0OTQ2NTg5LCJpYXQiOjE3NzQ5NDI5ODl9.XfImbz3_5XK_O0cRuHmIXFciLMsagIbo0Q7DJFza3iQ
+
+{
+  "content": "작성자 본인이므로 정상적으로 수정되어야 한다."
+}
+
+### 타인 댓글 수정 시도
+PUT http://localhost:8080/posts/1/comments/1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjIiLCJhdXRoIjoiUk9MRV9VU0VSIiwiZXhwIjoxNzc0OTQ2NjIwLCJpYXQiOjE3NzQ5NDMwMjB9.WaUFtft-jUVKrISZcpifCMYUl2TabY_N7v-WrJRgPQY
+
+{
+  "content": "남의 댓글 몰래 수정하기 시도"
 }
