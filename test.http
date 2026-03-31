@@ -226,3 +226,7 @@ Authorization: Bearer (손상된 토큰 값)
 ### 게시글 좋아요 추가
 POST http://localhost:8080/posts/1/like
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjEiLCJhdXRoIjoiUk9MRV9VU0VSIiwiZXhwIjoxNzc0OTU1Njg5LCJpYXQiOjE3NzQ5NTIwODl9.t9mfAxi-qcc1aPWopwSC42aATcNGbGzwHFNzajiI8uY
+
+### 댓글 좋아요 토글
+POST http://localhost:8080/posts/1/comments/1/like
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjEiLCJhdXRoIjoiUk9MRV9VU0VSIiwiZXhwIjoxNzc0OTY0MzMxLCJpYXQiOjE3NzQ5NjA3MzF9.35rEG0QEueZIEDS5h87VJpRAULKJXz-M5_G8GMzd9js

@@ -3,15 +3,15 @@ package com.example.board.service;
 import com.example.board.dto.CommentRequestDto;
 import com.example.board.dto.CommentResponseDto;
 import com.example.board.dto.CommentUpdateRequestDto;
-import com.example.board.entity.Comment;
-import com.example.board.entity.Post;
-import com.example.board.entity.User;
-import com.example.board.entity.UserRoleEnum;
+import com.example.board.entity.*;
+import com.example.board.repository.CommentLikeRepository;
 import com.example.board.repository.CommentRepository;
 import com.example.board.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +19,7 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
+    private final CommentLikeRepository commentLikeRepository;
 
     public CommentResponseDto createComment(Long postId, CommentRequestDto requestDto, User user) {
         Post post = postRepository.findById(postId)
@@ -47,6 +48,23 @@ public class CommentService {
         checkUserAuthorization(comment, user);
 
         commentRepository.delete(comment);
+    }
+
+    @Transactional
+    public String toggleLike(Long commentId, User user) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 댓글이 존재하지 않습니다. id=" + commentId));
+
+        Optional<CommentLike> commentLike = commentLikeRepository.findByUserAndComment(user, comment);
+        if (commentLike.isPresent()) {
+            commentLikeRepository.delete(commentLike.get());
+            comment.decrementLikeCount();
+            return "댓글 좋아요 취소 완료";
+        } else {
+            commentLikeRepository.save(new CommentLike(user, comment));
+            comment.incrementLikeCount();
+            return "댓글 좋아요 완료";
+        }
     }
 
     // 작성자 일치 여부를 검증하는 공통 메서드

@@ -7,6 +7,7 @@ import com.example.board.security.UserDetailsImpl;
 import com.example.board.service.CommentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,4 +47,12 @@ public class CommentController {
         commentService.deleteComment(commentId, userDetails.getUser());
     }
 
+    @PostMapping("/{commentId}/like")
+    public ResponseEntity<String> toggleLike(
+            @PathVariable Long postId,
+            @PathVariable Long commentId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        String message = commentService.toggleLike(commentId, userDetails.getUser());
+        return ResponseEntity.ok(message);
+    }
 }

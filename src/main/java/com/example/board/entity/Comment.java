@@ -20,6 +20,9 @@ public class Comment extends BaseTimeEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @Column(nullable = false)
+    private int likeCount = 0;
+
     /*
      * @ManyToOne: 댓글(Many) 입장에서 게시글(One)과의 관계를 명시하는 어노테이션이다.
      * fetch = FetchType.LAZY: 지연 로딩 설정이다.
@@ -39,5 +42,15 @@ public class Comment extends BaseTimeEntity {
 
     public void update(String content) {
         this.content = content;
+    }
+
+    public void incrementLikeCount() {
+        this.likeCount++;
+    }
+
+    public void decrementLikeCount() {
+        if (this.likeCount > 0) {
+            this.likeCount--;
+        }
     }
 }
