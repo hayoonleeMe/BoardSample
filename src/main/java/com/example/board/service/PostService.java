@@ -41,9 +41,10 @@ public class PostService {
         return new PostResponseDto(savedPost);
     }
 
+    @Transactional(readOnly = true)
     public Page<PostResponseDto> getAllPosts(Pageable pageable) {
         // Repository에 Pageable 객체를 넘기면 알아서 데이터베이스에서 해당 페이지 번호의 조각만 가져온다.
-        Page<Post> postPage = postRepository.findAll(pageable);
+        Page<Post> postPage = postRepository.findAllWithUser(pageable);
 
         // 찾아온 Page<Post> 객체를 map 함수를 이용해 Page<PostResponseDto>로 변환하여 반환한다.
         return postPage.map(PostResponseDto::new);
@@ -53,7 +54,7 @@ public class PostService {
      * findById와 orElseThrow: 데이터베이스에서 id(글 번호)를 기준으로 데이터를 찾는다.
      * 만약 누군가 이미 삭제했거나 없는 번호를 요청했을 경우, 프로그램이 멈추지 않도록 예외(에러 메시지)를 발생시키는 안전장치다.
      */
-    @Transactional()
+    @Transactional
     public PostResponseDto getPost(Long id, HttpServletRequest request, HttpServletResponse response) {
         Post post = findPost(id);
 

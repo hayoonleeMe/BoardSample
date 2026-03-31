@@ -4,6 +4,7 @@ import com.example.board.entity.Post;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 /*
  * JpaRepository 상속: JpaRepository<Post, Long>을 상속받는 것만으로 데이터베이스와 통신할 준비가 끝난다.
@@ -25,4 +26,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      * Containing: 전달받은 문자열(keyword)이 필드 값 앞, 뒤, 중간 어디든 포함되어 있으면 찾아오라는 의미다. (SQL의 LIKE %keyword% 와 동일하게 동작한다.)
      */
     Page<Post> findByTitleContaining(String keyword, Pageable pageable);
+
+    @Query(value = "SELECT p FROM Post p JOIN FETCH p.user", countQuery = "SELECT count(p) FROM Post p")
+    Page<Post> findAllWithUser(Pageable pageable);
 }
