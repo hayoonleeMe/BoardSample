@@ -1,5 +1,6 @@
 package com.example.board.config;
 
+import com.example.board.util.JwtUtil;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -27,6 +28,8 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true)
+                // 프론트엔드 자바스크립트에서 Authorization 헤더를 읽을 수 있도록 노출시킨다.
+                .exposedHeaders(JwtUtil.AUTHORIZATION_HEADER)
                 .maxAge(3600);
     }
 }
