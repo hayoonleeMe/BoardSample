@@ -5,6 +5,7 @@ import com.example.board.dto.PostResponseDto;
 import com.example.board.dto.PostUpdateRequestDto;
 import com.example.board.entity.Post;
 import com.example.board.entity.User;
+import com.example.board.entity.UserRoleEnum;
 import com.example.board.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -81,8 +82,9 @@ public class PostService {
 
     // 작성자 일치 여부를 검증하는 공통 메서드
     private void checkUserAuthorization(Post post, User user) {
-        if (!post.getUser().getId().equals(user.getId())) {
-            throw new IllegalArgumentException("게시글의 작성자만 수정 및 삭제할 수 있습니다.");
+        // 사용자의 권한이 관리자(ADMIN)가 아니고, 게시글의 작성자 아이디와 현재 로그인한 사용자의 아이디가 다를 경우 예외 발생
+        if (!user.getRole().equals(UserRoleEnum.ADMIN) && !post.getUser().getId().equals(user.getId())) {
+            throw new IllegalArgumentException("작성자 또는 관리자만 수정 및 삭제할 수 있습니다.");
         }
     }
 }

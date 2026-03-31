@@ -95,6 +95,26 @@ Content-Type: application/json
   "password": "Password123"
 }
 
+### 관리자 회원가입
+POST http://localhost:8080/users/signup
+Content-Type: application/json
+
+{
+  "username": "adminuser",
+  "password": "Password123",
+  "admin": true,
+  "adminToken": "AAABnvxRVklrnYxKZ0aHgTBcXukeZygoC"
+}
+
+### 관리자 로그인 테스트
+POST http://localhost:8080/users/login
+Content-Type: application/json
+
+{
+  "username": "adminuser",
+  "password": "Password123"
+}
+
 ### 게시글 작성 (토큰 없음)
 POST http://localhost:8080/posts
 Content-Type: application/json
@@ -171,4 +191,24 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjIiLCJhdXRoIjoiU
 
 {
   "content": "남의 댓글 몰래 수정하기 시도"
+}
+
+### 타인 게시글 수정 시도 (일반 사용자)
+PUT http://localhost:8080/posts/1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjIiLCJhdXRoIjoiUk9MRV9VU0VSIiwiZXhwIjoxNzc0OTQ2NjIwLCJpYXQiOjE3NzQ5NDMwMjB9.WaUFtft-jUVKrISZcpifCMYUl2TabY_N7v-WrJRgPQY
+
+{
+  "title": "남의 글 수정",
+  "content": "실패해야 한다."
+}
+
+### 타인 게시글 수정 시도 (관리자)
+PUT http://localhost:8080/posts/1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbnVzZXIiLCJhdXRoIjoiUk9MRV9BRE1JTiIsImV4cCI6MTc3NDk0NzUxMCwiaWF0IjoxNzc0OTQzOTEwfQ.0zE5fCjiE4Esyu8FM8Cnn9ozrYe0DvO88-ZdtuhfozE
+
+{
+  "title": "관리자에 의한 수정",
+  "content": "작성자가 아니더라도 관리자 권한이므로 정상적으로 수정되어야 한다."
 }
