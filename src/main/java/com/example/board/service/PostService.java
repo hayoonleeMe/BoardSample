@@ -4,6 +4,7 @@ import com.example.board.dto.PostRequestDto;
 import com.example.board.dto.PostResponseDto;
 import com.example.board.dto.PostUpdateRequestDto;
 import com.example.board.entity.Post;
+import com.example.board.entity.User;
 import com.example.board.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,8 +23,8 @@ public class PostService {
 
     private final PostRepository postRepository;
 
-    public PostResponseDto createPost(PostRequestDto requestDto) {
-        Post post = new Post(requestDto.getTitle(), requestDto.getContent(), requestDto.getAuthor());
+    public PostResponseDto createPost(PostRequestDto requestDto, User user) {
+        Post post = new Post(requestDto.getTitle(), requestDto.getContent(), user);
         Post savedPost = postRepository.save(post);
         return new PostResponseDto(savedPost);
     }
@@ -52,22 +53,36 @@ public class PostService {
      * 특히 수정을 할 때 이 어노테이션이 있어야만 앞서 설명한 변경 감지(Dirty Checking) 마법이 발동하여 데이터베이스에 값이 정상적으로 반영된다.
      */
     @Transactional
-    public PostResponseDto updatePost(Long id, PostUpdateRequestDto requestDto) {
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다. id=" + id));
+    public PostResponseDto updatePost(Long id, PostUpdateRequestDto requestDto, User user) {
+        Post post = findPost(id);
+        checkUserAuthorization(post, user);
+
         post.update(requestDto.getTitle(), requestDto.getContent());
         return new PostResponseDto(post);
     }
 
     @Transactional
-    public void deletePost(Long id) {
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다. id=" + id));
+    public void deletePost(Long id, User user) {
+        Post post = findPost(id);
+        checkUserAuthorization(post, user);
+
         postRepository.delete(post);
     }
 
     public Page<PostResponseDto> searchPosts(String keyword, Pageable pageable) {
         Page<Post> postPage = postRepository.findByTitleContaining(keyword, pageable);
         return postPage.map(PostResponseDto::new);
+    }
+
+    private Post findPost(Long id) {
+        return postRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다. id=" + id));
+    }
+
+    // 작성자 일치 여부를 검증하는 공통 메서드
+    private void checkUserAuthorization(Post post, User user) {
+        if (!post.getUser().getId().equals(user.getId())) {
+            throw new IllegalArgumentException("게시글의 작성자만 수정 및 삭제할 수 있습니다.");
+        }
     }
 }

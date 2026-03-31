@@ -108,10 +108,40 @@ Content-Type: application/json
 ### 게시글 작성 (토큰 포함)
 POST http://localhost:8080/posts
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjEiLCJhdXRoIjoiUk9MRV9VU0VSIiwiZXhwIjoxNzc0OTM3MzYzLCJpYXQiOjE3NzQ5MzM3NjN9.Nn344i11eM5vRE3aWQskSHohdpou157Q8C127fhKwhA
+Authorization: Bearer ()
 
 {
   "title": "토큰 인증 테스트",
   "content": "정상적으로 인증을 통과하여 글이 작성되어야 한다.",
   "author": "초보개발자"
+}
+
+### 게시글 작성
+POST http://localhost:8080/posts
+Content-Type: application/json
+Authorization: Bearer ()
+
+{
+  "title": "작성자 연동 테스트",
+  "content": "이 글은 토큰 주인의 이름으로 작성되어야 한다."
+}
+
+### 게시글 수정
+PUT http://localhost:8080/posts/1
+Content-Type: application/json
+Authorization: Bearer ()
+
+{
+  "title": "수정된 게시글 제목",
+  "content": "작성자 본인이므로 정상 수정되어야 한다."
+}
+
+### 타인 게시글 수정 시도
+PUT http://localhost:8080/posts/1
+Content-Type: application/json
+Authorization: Bearer ()
+
+{
+  "title": "남의 글 몰래 수정하기",
+  "content": "이 요청은 실패해야 한다."
 }

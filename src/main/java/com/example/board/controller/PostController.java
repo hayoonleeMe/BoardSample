@@ -3,6 +3,7 @@ package com.example.board.controller;
 import com.example.board.dto.PostRequestDto;
 import com.example.board.dto.PostResponseDto;
 import com.example.board.dto.PostUpdateRequestDto;
+import com.example.board.security.UserDetailsImpl;
 import com.example.board.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 /*
@@ -41,10 +43,14 @@ public class PostController {
      * @Valid: DTO 클래스 내부에 설정해둔 검증 규칙(@NotBlank, @Size 등)을 실제로 작동시키라고 스프링에게 내리는 실행 스위치다.
      * 클라이언트의 요청 데이터가 컨트롤러의 메서드 안으로 본격적으로 진입하기 직전에 문지기처럼 데이터를 먼저 검사한다.
      * 만약 규칙을 하나라도 통과하지 못하면 메서드 내부의 로직을 아예 실행하지 않고 즉시 예외(MethodArgumentNotValidException)를 발생시켜 불량 데이터의 침입을 원천 차단한다.
+     *
+     * @AuthenticationPrincipal : 스프링 시큐리티가 제공하는 어노테이션으로, 앞선 JwtAuthorizationFilter 에서 인증을 마치고 SecurityContext 에 담아두었던 인증 객체(UserDetailsImpl) 를 컨트롤러의 파라미터로 곧바로 꺼내어 주입해 준다.
+     * 이를 통해 현재 요청을 보낸 사용자의 엔티티 정보를 서비스 계층으로 넘겨줄 수 있다.
      */
     @PostMapping
-    public PostResponseDto createPost(@Valid @RequestBody PostRequestDto requestDto) {
-        return postService.createPost(requestDto);
+    public PostResponseDto createPost(@Valid @RequestBody PostRequestDto requestDto,
+                                      @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return postService.createPost(requestDto, userDetails.getUser());
     }
 
     /*
@@ -82,12 +88,15 @@ public class PostController {
      * @PutMapping / @DeleteMapping: 자원의 수정과 삭제를 의미하는 HTTP 메서드 규칙에 맞춰 컨트롤러의 동작을 분리했다.
      */
     @PutMapping("/{id}")
-    public PostResponseDto updatePost(@PathVariable Long id, @Valid @RequestBody PostUpdateRequestDto requestDto) {
-        return postService.updatePost(id, requestDto);
+    public PostResponseDto updatePost(@PathVariable Long id,
+                                      @Valid @RequestBody PostUpdateRequestDto requestDto,
+                                      @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return postService.updatePost(id, requestDto, userDetails.getUser());
     }
 
     @DeleteMapping("/{id}")
-    public void deletePost(@PathVariable Long id) {
-        postService.deletePost(id);
+    public void deletePost(@PathVariable Long id,
+                           @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        postService.deletePost(id, userDetails.getUser());
     }
 }

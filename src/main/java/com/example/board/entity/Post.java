@@ -40,7 +40,9 @@ public class Post extends BaseTimeEntity {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
-    private String author;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     /*
      * @OneToMany: 게시글(One) 입장에서 댓글(Many)과의 관계를 명시한다.
@@ -61,9 +63,9 @@ public class Post extends BaseTimeEntity {
         this.content = content;
     }
 
-    public Post(String title, String content, String author) {
+    public Post(String title, String content, User user) {
         this.title = title;
         this.content = content;
-        this.author = author;
+        this.user = user;
     }
 }
