@@ -1,9 +1,12 @@
 package com.example.board.service;
 
+import com.example.board.dto.LoginRequestDto;
 import com.example.board.dto.SignupRequestDto;
 import com.example.board.entity.User;
 import com.example.board.entity.UserRoleEnum;
 import com.example.board.repository.UserRepository;
+import com.example.board.util.JwtUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,6 +21,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     @Value("${admin.token}")
     private String adminToken;
@@ -51,5 +55,25 @@ public class UserService {
         // 4. 회원 엔티티 생성 및 데이터베이스 저장
         User user = new User(username, password, role);
         userRepository.save(user);
+    }
+
+    @Transactional(readOnly = true)
+    public void login(LoginRequestDto requestDto, HttpServletResponse response) {
+        String username = requestDto.getUsername();
+        String password = requestDto.getPassword();
+
+        // 1. 사용자 존재 여부 확인
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("등록된 사용자가 없습니다."));
+
+        // 2. 비밀번호 일치 여부 확인
+        // passwordEncoder.matches() 는 평문 비밀번호와 암호화된 비밀번호를 비교해 준다.
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        // 3. 인증 성공 시 JWT 생성 및 HTTP 응답 헤더에 추가
+        String token = jwtUtil.createToken(user.getUsername(), user.getRole());
+        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, token);
     }
 }

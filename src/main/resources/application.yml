@@ -24,3 +24,7 @@ springdoc:
 
 admin:
   token: ${ADMIN_TOKEN}
+
+jwt:
+  secret:
+    key: ${JWT_SECRET_KEY}
