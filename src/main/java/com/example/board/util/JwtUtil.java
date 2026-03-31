@@ -1,21 +1,27 @@
 package com.example.board.util;
 
 import com.example.board.entity.UserRoleEnum;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
 
 /*
+ * @Slf4j : 로그 출력을 위한 롬복 어노테이션
+ *
  * @Component : 스프링 프레임워크가 시작될 때 이 클래스를 찾아 스스로 관리하는 객체(빈, Bean)로 등록하도록 지시하는 어노테이션이다.
  * 이를 통해 UserService 같은 다른 서비스 객체에서 필요할 때마다 new JwtUtil() 로 생성하지 않고, 스프링으로부터 자동으로 주입받아 사용할 수 있게 된다.
  */
+@Slf4j
 @Component
 public class JwtUtil {
 
@@ -65,5 +71,48 @@ public class JwtUtil {
                         .setIssuedAt(date) // 발급일
                         .signWith(key, signatureAlgorithm) // 암호화 알고리즘
                         .compact();
+    }
+
+    /*
+     * getJwtFromHeader: 클라이언트의 요청 정보를 담고 있는 HttpServletRequest 에서 Authorization 헤더 값을 꺼낸다.
+     * 값이 존재하고 Bearer  로 시작한다면, 접두사 7글자를 잘라내어 순수한 토큰 문자열만 반환한다.
+     */
+    public String getJwtFromHeader(HttpServletRequest request) {
+        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
+            return bearerToken.substring(BEARER_PREFIX.length());
+        }
+        return null;
+    }
+
+    /*
+     * validateToken: 주입받은 비밀키(key)를 사용해 토큰을 해독해 본다.
+     * 이 과정에서 토큰이 만료되었거나 누군가 임의로 변조했다면 예외(Exception)가 발생하여 false 를 반환하게 된다.
+     */
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            return true;
+        } catch (SecurityException | MalformedJwtException | SignatureException e) {
+            // 위조되었거나 손상된 토큰
+            log.error("Invalid JWT signature, 유효하지 않는 JWT 서명입니다.");
+        } catch (ExpiredJwtException e) {
+            // 만료된 토큰
+            log.error("Expired JWT token, 만료된 JWT 토큰입니다.");
+        } catch (UnsupportedJwtException e) {
+            // 지원되지 않는 형식의 토큰
+            log.error("Unsupported JWT token, 지원되지 않는 JWT 토큰입니다.");
+        } catch (IllegalArgumentException e) {
+            // 빈 토큰
+            log.error("JWT claims is empty, 잘못된 JWT 토큰입니다.");
+        }
+        return false;
+    }
+
+    /*
+     * getUserInfoFromToken: 유효성이 검증된 토큰의 본문(Body)을 열어 그 안에 담아두었던 사용자 아이디(Subject)와 권한(Claims) 정보를 꺼내어 반환한다.
+     */
+    public Claims getUserInfoFromToken(String token) {
+        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
     }
 }

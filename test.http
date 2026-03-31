@@ -94,3 +94,24 @@ Content-Type: application/json
   "username": "testuser1",
   "password": "Password123"
 }
+
+### 게시글 작성 (토큰 없음)
+POST http://localhost:8080/posts
+Content-Type: application/json
+
+{
+  "title": "토큰 없이 작성하는 글",
+  "content": "이 요청은 거부되어야 한다.",
+  "author": "초보개발자"
+}
+
+### 게시글 작성 (토큰 포함)
+POST http://localhost:8080/posts
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjEiLCJhdXRoIjoiUk9MRV9VU0VSIiwiZXhwIjoxNzc0OTM3MzYzLCJpYXQiOjE3NzQ5MzM3NjN9.Nn344i11eM5vRE3aWQskSHohdpou157Q8C127fhKwhA
+
+{
+  "title": "토큰 인증 테스트",
+  "content": "정상적으로 인증을 통과하여 글이 작성되어야 한다.",
+  "author": "초보개발자"
+}

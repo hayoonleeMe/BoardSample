@@ -1,5 +1,9 @@
 package com.example.board.config;
 
+import com.example.board.security.JwtAuthorizationFilter;
+import com.example.board.security.UserDetailsServiceImpl;
+import com.example.board.util.JwtUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -9,13 +13,18 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /*
  * @EnableWebSecurity: 스프링이 기본적으로 제공하는 보안 설정을 무효화하고, 우리가 작성한 WebSecurityConfig 의 필터 체인(Filter Chain) 설정을 애플리케이션에 적용하도록 지시하는 어노테이션이다.
  */
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class WebSecurityConfig {
+
+    private final JwtUtil jwtUtil;
+    private final UserDetailsServiceImpl userDetailsService;
 
     /*
      * PasswordEncoder: 사용자가 입력한 비밀번호를 날것(Plain Text) 그대로 데이터베이스에 저장하면 심각한 보안 사고로 이어진다.
@@ -24,6 +33,11 @@ public class WebSecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public JwtAuthorizationFilter jwtAuthorizationFilter() {
+        return new JwtAuthorizationFilter(jwtUtil, userDetailsService);
     }
 
     /*
@@ -36,6 +50,9 @@ public class WebSecurityConfig {
      * authorizeHttpRequests: URL 경로와 HTTP 메서드에 따라 접근 권한을 세밀하게 설정한다.
      * Swagger 와 관련된 경로, 조회를 위한 GET 요청, 그리고 앞으로 만들 회원가입/로그인 경로는 .permitAll() 로 열어두어 누구나 접근할 수 있게 한다.
      * 반대로 글 작성(POST), 수정(PUT), 삭제(DELETE) 등 명시되지 않은 모든 요청은 .authenticated() 에 의해 인증된 사용자만 통과할 수 있다.
+     *
+     * addFilterBefore: 스프링 시큐리티의 기본 인증 필터인 UsernamePasswordAuthenticationFilter 가 실행되기 직전에 방금 만든 JwtAuthorizationFilter 가 먼저 실행되도록 끼워 넣는다.
+     * 즉, 아이디와 비밀번호로 검증하기 전에 토큰을 먼저 확인하여, 유효한 토큰이 있다면 인증된 사용자로 바로 통과시키는 논리다.
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -58,6 +75,9 @@ public class WebSecurityConfig {
                         // 그 외의 모든 요청은 인증 처리가 필요함
                         .anyRequest().authenticated()
         );
+
+        // JWT 필터를 기본 인증 필터 앞에 끼워 넣는다.
+        http.addFilterBefore(jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
